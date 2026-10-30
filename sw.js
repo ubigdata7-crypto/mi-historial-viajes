@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-tracker-v2';
+const CACHE_NAME = 'travel-tracker-v1';
 const urlsToCache = [
   './',
   './index.html',
