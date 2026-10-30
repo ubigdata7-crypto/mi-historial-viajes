@@ -12,8 +12,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentLanguage = localStorage.getItem('language') || 'es';
 
     const translations = {
-        es: { title: "Mi Historial de Viajes", desc: "Añade y gestiona todos tus viajes.", formTitle: "Agregar Nuevo Viaje", lFecha: "Fecha de salida:", lOrigen: "Origen:", lDestino: "Destino:", lTransporte: "Medio de transporte:", oAuto: "Auto", oAvion: "Avión", oBarco: "Barco", btnSave: "Guardar Viaje", btnUpdate: "Actualizar Viaje", mapTitle: "Mapa de Viajes", histTitle: "Historial de Viajes", tKm: "Total de km recorridos:", errCoords: "No se encontró una de las ciudades. Escribe el nombre completo.", confirmDel: "¿Eliminar este viaje?" },
-        en: { title: "My Travel History", desc: "Add and manage all your trips.", formTitle: "Add New Trip", lFecha: "Departure date:", lOrigen: "Origin:", lDestino: "Destination:", lTransporte: "Transport:", oAuto: "Car", oAvion: "Plane", oBarco: "Boat", btnSave: "Save Trip", btnUpdate: "Update Trip", mapTitle: "Travel Map", histTitle: "Travel History", tKm: "Total Km traveled:", errCoords: "Could not find one of the cities.", confirmDel: "Delete this trip?" }
+        es: { title: "Mi Historial de Viajes", desc: "Añade y gestiona todos tus viajes.", formTitle: "Agregar Nuevo Viaje", lFecha: "Fecha de salida:", lOrigen: "Origen:", lDestino: "Destino:", lTransporte: "Medio de transporte:", oAuto: "Auto", oAvion: "Avión", oBarco: "Barco", btnSave: "Guardar Viaje", btnUpdate: "Actualizar Viaje", mapTitle: "Mapa de Viajes", histTitle: "Historial de Viajes", tKm: "Total de km recorridos:", errCoords: "No se encontró una de las ciudades. Escribe el nombre completo.", confirmDel: "¿Eliminar este viaje?", hFecha: "Fecha", hOrigen: "Origen", hDestino: "Destino", hTrans: "Transporte", hKm: "Km", hAcciones: "Acciones" },
+        en: { title: "My Travel History", desc: "Add and manage all your trips.", formTitle: "Add New Trip", lFecha: "Departure date:", lOrigen: "Origin:", lDestino: "Destination:", lTransporte: "Transport:", oAuto: "Car", oAvion: "Plane", oBarco: "Boat", btnSave: "Save Trip", btnUpdate: "Update Trip", mapTitle: "Travel Map", histTitle: "Travel History", tKm: "Total Km traveled:", errCoords: "Could not find one of the cities.", confirmDel: "Delete this trip?", hFecha: "Date", hOrigen: "Origin", hDestino: "Destination", hTrans: "Transport", hKm: "Km", hAcciones: "Actions" },
+        fr: { title: "Mon historique de voyages", desc: "Ajoutez et gérez tous vos voyages.", formTitle: "Ajouter un nouveau voyage", lFecha: "Date de départ:", lOrigen: "Origine:", lDestino: "Destination:", lTransporte: "Moyen de transport:", oAuto: "Voiture", oAvion: "Avion", oBarco: "Bateau", btnSave: "Enregistrer le voyage", btnUpdate: "Mettre à jour", mapTitle: "Carte des voyages", histTitle: "Historique des voyages", tKm: "Total de km parcourus:", errCoords: "Impossible de trouver une des villes.", confirmDel: "Supprimer ce voyage?", hFecha: "Date", hOrigen: "Origine", hDestino: "Destination", hTrans: "Transport", hKm: "Km", hAcciones: "Actions" },
+        pt: { title: "Meu Histórico de Viagens", desc: "Adicione e gerencie todas as suas viagens.", formTitle: "Adicionar Nova Viagem", lFecha: "Data de partida:", lOrigen: "Origem:", lDestino: "Destino:", lTransporte: "Meio de transporte:", oAuto: "Carro", oAvion: "Avião", oBarco: "Barco", btnSave: "Salvar Viagem", btnUpdate: "Atualizar Viagem", mapTitle: "Mapa de Viagens", histTitle: "Histórico de Viagens", tKm: "Total de km percorridos:", errCoords: "Não foi possível encontrar uma das cidades.", confirmDel: "Excluir esta viagem?", hFecha: "Data", hOrigen: "Origem", hDestino: "Destino", hTrans: "Transporte", hKm: "Km", hAcciones: "Ações" }
     };
 
     const setLanguage = (lang) => {
@@ -25,12 +27,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('label-origen').textContent = t.lOrigen;
         document.getElementById('label-destino').textContent = t.lDestino;
         document.getElementById('label-transporte').textContent = t.lTransporte;
+        
         transporteSelect.querySelector('option[value="auto"]').textContent = t.oAuto;
         transporteSelect.querySelector('option[value="avion"]').textContent = t.oAvion;
         transporteSelect.querySelector('option[value="barco"]').textContent = t.oBarco;
+        
         document.getElementById('save-button').textContent = travelForm.dataset.editing ? t.btnUpdate : t.btnSave;
+        
         document.getElementById('map-title').textContent = t.mapTitle;
         document.getElementById('history-title').textContent = t.histTitle;
+        
+        document.getElementById('header-fecha').textContent = t.hFecha;
+        document.getElementById('header-origen').textContent = t.hOrigen;
+        document.getElementById('header-destino').textContent = t.hDestino;
+        document.getElementById('header-transporte').textContent = t.hTrans;
+        document.getElementById('header-km').textContent = t.hKm;
+        document.getElementById('header-acciones').textContent = t.hAcciones;
+
         renderTravels();
     };
 
@@ -42,17 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const getCoordinates = async (city) => {
         try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`);
-            const data = await res.json();
-            if (data.length > 0) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-            return null;
-        } catch (e) { return null; }
-    };
-
-    const getSuggestions = async (query, container, inputField) => {
-        if (query.length < 3) { container.innerHTML = ''; return; }
-        try {
-            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(city)}&limit=1`); const data = await res.json(); if (data.length > 0) return [parseFloat(data[0].lat), parseFloat(data[0].lon)]; return null; } catch (e) { return null; } };  const getSuggestions = async (query, container, inputField) => { if (query.length < 3) { container.innerHTML = ''; return; } try { const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`);
             const data = await res.json();
             container.innerHTML = '';
             if (data.length > 0) {
@@ -113,6 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
         travels.forEach((t) => {
             const row = document.createElement('tr');
             const icon = t.transporte === 'auto' ? '🚗' : t.transporte === 'barco' ? '⛴️' : '✈️';
+            const tDict = translations[currentLanguage] || translations['es'];
+            
             row.innerHTML = `
                 <td>${t.fecha}</td><td>${t.origen}</td><td>${t.destino}</td><td>${icon}</td><td>${t.km}</td>
                 <td>
@@ -123,106 +128,4 @@ document.addEventListener('DOMContentLoaded', () => {
             totalKm += parseFloat(t.km || 0);
         });
         const trans = translations[currentLanguage] || translations['es'];
-        totalKmElement.textContent = `${trans.tKm} ${totalKm.toFixed(2)} km`;
-        drawTravelsOnMap();
-    };
-
-    const saveTravel = async (e) => {
-        e.preventDefault();
-        const btnSave = document.getElementById('save-button');
-        btnSave.disabled = true;
-        btnSave.textContent = "...";
-
-        const tDict = translations[currentLanguage] || translations['es'];
-        const fecha = document.getElementById('fecha').value;
-        const origen = origenInput.value;
-        const destino = destinoInput.value;
-        const transporte = transporteSelect.value;
-        
-        const coordsOrigen = await getCoordinates(origen);
-        const coordsDestino = await getCoordinates(destino);
-        
-        let km = 0; let ruta = null;
-
-        if (coordsOrigen && coordsDestino) {
-            if (transporte === 'auto') {
-                const dRes = await getDrivingRoute(coordsOrigen, coordsDestino);
-                if (dRes) { km = dRes.km; ruta = dRes.ruta; } 
-                else { km = getStraightDistance(coordsOrigen, coordsDestino); }
-            } else { km = getStraightDistance(coordsOrigen, coordsDestino); }
-        } else {
-            alert(tDict.errCoords);
-            btnSave.disabled = false;
-            btnSave.textContent = travelForm.dataset.editing ? tDict.btnUpdate : tDict.btnSave;
-            return;
-        }
-        
-        const editedId = travelForm.dataset.editing;
-        const travelData = { id: editedId ? parseInt(editedId) : Date.now(), fecha, origen, destino, transporte, km, ruta, coordsOrigen, coordsDestino };
-
-        if (editedId) {
-            const index = travels.findIndex(t => t.id == editedId);
-            if (index !== -1) travels[index] = travelData;
-            travelForm.removeAttribute('data-editing');
-        } else { travels.push(travelData); }
-
-        localStorage.setItem('travels', JSON.stringify(travels));
-        travelForm.reset();
-        btnSave.disabled = false;
-        btnSave.textContent = tDict.btnSave;
-        renderTravels();
-    };
-
-    let timeoutOrigen, timeoutDestino;
-    origenInput.addEventListener('input', () => {
-        clearTimeout(timeoutOrigen);
-        timeoutOrigen = setTimeout(() => getSuggestions(origenInput.value, suggestionsOrigen, origenInput), 600);
-    });
-    destinoInput.addEventListener('input', () => {
-        clearTimeout(timeoutDestino);
-        timeoutDestino = setTimeout(() => getSuggestions(destinoInput.value, suggestionsDestino, destinoInput), 600);
-    });
-    document.addEventListener('mousedown', (e) => {
-        if (!origenInput.contains(e.target) && !suggestionsOrigen.contains(e.target)) suggestionsOrigen.innerHTML = '';
-        if (!destinoInput.contains(e.target) && !suggestionsDestino.contains(e.target)) suggestionsDestino.innerHTML = '';
-    });
-
-    travelForm.addEventListener('submit', saveTravel);
-    travelTableBody.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        const tDict = translations[currentLanguage] || translations['es'];
-        if (e.target.classList.contains('delete-btn')) {
-            if (confirm(tDict.confirmDel)) {
-                travels = travels.filter(t => t.id != id);
-                localStorage.setItem('travels', JSON.stringify(travels));
-                renderTravels();
-            }
-        }
-        if (e.target.classList.contains('edit-btn')) {
-            const t = travels.find(tr => tr.id == id);
-            if (t) {
-                document.getElementById('fecha').value = t.fecha;
-                origenInput.value = t.origen;
-                destinoInput.value = t.destino;
-                transporteSelect.value = t.transporte;
-                travelForm.dataset.editing = t.id;
-                document.getElementById('save-button').textContent = tDict.btnUpdate;
-            }
-        }
-    });
-
-    languageSelector.addEventListener('change', (e) => {
-        currentLanguage = e.target.value;
-        localStorage.setItem('language', currentLanguage);
-        setLanguage(currentLanguage);
-    });
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js').catch(() => {});
-        });
-    }
-
-    languageSelector.value = currentLanguage;
-    setLanguage(currentLanguage);
-});
+        totalKmElement.textContent = `${
