@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mi Historial de Viajes</title>
+    <!-- Evita error 404 del favicon -->
+    <link rel="icon" href="data:,">
+    <!-- Enlace al Manifest para la instalación PWA -->
+    <link rel="manifest" href="manifest.json">
+    <!-- Color de la barra de estado en móviles -->
+    <meta name="theme-color" content="#007bff">
+    <!-- Soporte para iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Viajes">
+    <link rel="apple-touch-icon" href="icon.png">
+    
+    <!-- CSS de Leaflet (Mapas) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 id="app-title">Mi Historial de Viajes</h1>
+            <p id="app-description">Añade y gestiona todos tus viajes.</p>
+            <select id="language-selector">
+                <option value="es">Español</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="pt">Português</option>
+            </select>
+        </header>
+
+        <main>
+            <section class="form-section">
+                <h2 id="form-title">Agregar Nuevo Viaje</h2>
+                <form id="travel-form">
+                    <div class="form-group">
+                        <label for="fecha" id="label-fecha">Fecha de salida:</label>
+                        <input type="date" id="fecha" required>
+                    </div>
+                    
+                    <div class="form-group autocomplete-container">
+                        <label for="origen" id="label-origen">Origen:</label>
+                        <input type="text" id="origen" autocomplete="off" required>
+                        <div id="suggestions-origen" class="suggestions"></div>
+                    </div>
+                    
+                    <div class="form-group autocomplete-container">
+                        <label for="destino" id="label-destino">Destino:</label>
+                        <input type="text" id="destino" autocomplete="off" required>
+                        <div id="suggestions-destino" class="suggestions"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transporte" id="label-transporte">Medio de transporte:</label>
+                        <select id="transporte">
+                            <option value="auto">Auto</option>
+                            <option value="avion">Avión</option>
+                            <option value="barco">Barco</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" id="save-button" class="btn btn-primary">Guardar Viaje</button>
+                </form>
+            </section>
+
+            <section class="map-section">
+                <h2 id="map-title">Mapa de Viajes</h2>
+                <div id="map"></div>
+            </section>
+
+            <section class="table-section">
+                <h2 id="history-title">Historial de Viajes</h2>
+                <h3 id="total-km">Total de km recorridos: 0 km</h3>
+                <div class="table-responsive">
+                    <table id="travel-table">
+                        <thead>
+                            <tr>
+                                <th id="header-fecha">Fecha</th>
+                                <th id="header-origen">Origen</th>
+                                <th id="header-destino">Destino</th>
+                                <th id="header-transporte">Transporte</th>
+                                <th id="header-km">Km</th>
+                                <th id="header-acciones">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los viajes se cargarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts de Leaflet y aplicación -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
