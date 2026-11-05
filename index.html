@@ -4,19 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mi Historial de Viajes</title>
-    <!-- Evita error 404 del favicon -->
-    <link rel="icon" href="data:,">
-    <!-- Enlace al Manifest para la instalación PWA -->
+    <link rel="icon" href="icon.png">
     <link rel="manifest" href="manifest.json">
-    <!-- Color de la barra de estado en móviles -->
     <meta name="theme-color" content="#007bff">
-    <!-- Soporte para iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Viajes">
     <link rel="apple-touch-icon" href="icon.png">
     
-    <!-- CSS de Leaflet (Mapas) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css">
 </head>
@@ -74,6 +69,14 @@
 
             <section class="table-section">
                 <h2 id="history-title">Historial de Viajes</h2>
+                
+                <!-- Botones de transferencia -->
+                <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+                    <button id="btn-export" class="btn btn-primary btn-sm">⬇️ Exportar Datos</button>
+                    <input type="file" id="file-import" accept=".json" style="display: none;">
+                    <button id="btn-import" class="btn btn-primary btn-sm">⬆️ Importar Datos</button>
+                </div>
+                
                 <h3 id="total-km">Total de km recorridos: 0 km</h3>
                 <div class="table-responsive">
                     <table id="travel-table">
@@ -88,7 +91,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Los viajes se cargarán aquí dinámicamente -->
+                            <!-- Los viajes se cargarán aquí -->
                         </tbody>
                     </table>
                 </div>
@@ -96,8 +99,8 @@
         </main>
     </div>
 
-    <!-- Scripts de Leaflet y aplicación -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="app.js?v=99"></script>
+    <!-- Truco de versión para forzar actualización -->
+    <script src="app.js?v=100"></script>
 </body>
 </html>
