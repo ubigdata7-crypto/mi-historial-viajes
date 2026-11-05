@@ -1,4 +1,4 @@
-const CACHE_NAME = 'travel-tracker-v3';
+const CACHE_NAME = 'travel-tracker-v4';
 const urlsToCache = [
   './',
   './index.html',
@@ -7,7 +7,6 @@ const urlsToCache = [
   './manifest.json'
 ];
 
-// Instalar y forzar activación inmediata
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
@@ -15,7 +14,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Borrar cualquier caché antigua que haya quedado atascada
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -30,7 +28,6 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Estrategia "Network First": Siempre busca lo más nuevo en GitHub primero
 self.addEventListener('fetch', event => {
   event.respondWith(
     fetch(event.request).catch(() => caches.match(event.request))
