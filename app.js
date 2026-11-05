@@ -19,7 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
             mapTitle: "Mapa de Viajes", histTitle: "Historial de Viajes", hFecha: "Fecha", hOrigen: "Origen", 
             hDestino: "Destino", hTrans: "Transporte", hKm: "Km", hAcciones: "Acciones", tKm: "Total de km recorridos:", 
             errCoords: "No se encontró una de las ciudades. Escribe el nombre completo.", confirmDel: "¿Eliminar este viaje?", 
-            editBtn: "Editar", delBtn: "Eliminar"
+            editBtn: "Editar", delBtn: "Eliminar", btnExport: "⬇️ Exportar Datos", btnImport: "⬆️ Importar Datos",
+            alertNoExport: "No hay viajes para exportar.", alertImportSuccess: "Se importaron {n} viajes correctamente.",
+            alertImportFormat: "El archivo no tiene el formato correcto.", alertImportError: "Error al leer el archivo."
         },
         en: {
             title: "My Travel History", desc: "Add and manage all your trips.", formTitle: "Add New Trip", 
@@ -28,7 +30,9 @@ document.addEventListener('DOMContentLoaded', () => {
             mapTitle: "Travel Map", histTitle: "Travel History", hFecha: "Date", hOrigen: "Origin", 
             hDestino: "Destination", hTrans: "Transport", hKm: "Km", hAcciones: "Actions", tKm: "Total Km traveled:", 
             errCoords: "Could not find coordinates for one or both cities.", confirmDel: "Are you sure you want to delete this trip?", 
-            editBtn: "Edit", delBtn: "Delete"
+            editBtn: "Edit", delBtn: "Delete", btnExport: "⬇️ Export Data", btnImport: "⬆️ Import Data",
+            alertNoExport: "No trips to export.", alertImportSuccess: "Successfully imported {n} trips.",
+            alertImportFormat: "Invalid file format.", alertImportError: "Error reading file."
         },
         fr: {
             title: "Mon historique de voyages", desc: "Ajoutez et gérez tous vos voyages.", formTitle: "Ajouter un nouveau voyage", 
@@ -37,7 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
             mapTitle: "Carte des voyages", histTitle: "Historique des voyages", hFecha: "Date", hOrigen: "Origine", 
             hDestino: "Destination", hTrans: "Transport", hKm: "Km", hAcciones: "Actions", tKm: "Total de km parcourus:", 
             errCoords: "Impossible de trouver les coordonnées d'une ou des deux villes.", confirmDel: "Êtes-vous sûr de vouloir supprimer ce voyage?", 
-            editBtn: "Modifier", delBtn: "Supprimer"
+            editBtn: "Modifier", delBtn: "Supprimer", btnExport: "⬇️ Exporter", btnImport: "⬆️ Importer",
+            alertNoExport: "Aucun voyage à exporter.", alertImportSuccess: "{n} voyages importés avec succès.",
+            alertImportFormat: "Format de fichier invalide.", alertImportError: "Erreur de lecture du fichier."
         },
         pt: {
             title: "Meu Histórico de Viagens", desc: "Adicione e gerencie todas as suas viagens.", formTitle: "Adicionar Nova Viagem", 
@@ -45,8 +51,10 @@ document.addEventListener('DOMContentLoaded', () => {
             oAuto: "Carro", oAvion: "Avião", oBarco: "Barco", btnSave: "Salvar Viagem", btnUpdate: "Atualizar Viagem", 
             mapTitle: "Mapa de Viagens", histTitle: "Histórico de Viagens", hFecha: "Data", hOrigen: "Origem", 
             hDestino: "Destino", hTrans: "Transporte", hKm: "Km", hAcciones: "Ações", tKm: "Total de km percorridos:", 
-            errCoords: "Não foi possível encontrar as coordenadas de uma ou ambas as cidades.", confirmDel: "Tem certeza de que deseja excluir esta viagem?", 
-            editBtn: "Editar", delBtn: "Excluir"
+            errCoords: "Não foi possível encontrar as coordenadas.", confirmDel: "Tem certeza de que deseja excluir esta viagem?", 
+            editBtn: "Editar", delBtn: "Excluir", btnExport: "⬇️ Exportar Dados", btnImport: "⬆️ Importar Dados",
+            alertNoExport: "Nenhuma viagem para exportar.", alertImportSuccess: "{n} viagens importadas com sucesso.",
+            alertImportFormat: "Formato de arquivo inválido.", alertImportError: "Erro ao ler o arquivo."
         }
     };
 
@@ -79,6 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('header-transporte').textContent = t.hTrans;
         document.getElementById('header-km').textContent = t.hKm;
         document.getElementById('header-acciones').textContent = t.hAcciones;
+
+        // Nuevos botones de importación/exportación
+        document.getElementById('btn-export').textContent = t.btnExport;
+        document.getElementById('btn-import').textContent = t.btnImport;
 
         renderTravels();
     };
@@ -224,6 +236,55 @@ document.addEventListener('DOMContentLoaded', () => {
         renderTravels();
     };
 
+    // Funciones Exportar / Importar
+    document.getElementById('btn-export').addEventListener('click', () => {
+        const tDict = translations[currentLanguage] || translations['es'];
+        if (travels.length === 0) {
+            alert(tDict.alertNoExport);
+            return;
+        }
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(travels));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "mis_viajes.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    });
+
+    const fileImport = document.getElementById('file-import');
+    document.getElementById('btn-import').addEventListener('click', () => fileImport.click());
+    
+    fileImport.addEventListener('change', (event) => {
+        const tDict = translations[currentLanguage] || translations['es'];
+        const file = event.target.files[0];
+        if (!file) return;
+        
+        const fileReader = new FileReader();
+        fileReader.onload = (e) => {
+            try {
+                const importedTravels = JSON.parse(e.target.result);
+                if (Array.isArray(importedTravels)) {
+                    const currentIds = new Set(travels.map(t => t.id));
+                    const newTravels = importedTravels.filter(t => !currentIds.has(t.id));
+                    
+                    travels = [...travels, ...newTravels];
+                    localStorage.setItem('travels', JSON.stringify(travels));
+                    renderTravels();
+                    // Reemplaza el marcador {n} por el numero de viajes nuevos
+                    alert(tDict.alertImportSuccess.replace('{n}', newTravels.length));
+                } else {
+                    alert(tDict.alertImportFormat);
+                }
+            } catch (error) {
+                alert(tDict.alertImportError);
+            }
+            fileImport.value = '';
+        };
+        fileReader.readAsText(file);
+    });
+
+    // Eventos de autocompletado y botones de tabla
     let timeoutOrigen, timeoutDestino;
     origenInput.addEventListener('input', () => {
         clearTimeout(timeoutOrigen);
@@ -239,6 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     travelForm.addEventListener('submit', saveTravel);
+    
     travelTableBody.addEventListener('click', (e) => {
         const id = e.target.dataset.id;
         const tDict = translations[currentLanguage] || translations['es'];
